@@ -13,8 +13,15 @@ public class People implements Runnable, ThreadedAgent {
         this.x = x;
         this.y = y;
         Random random = new Random();
-        this.dx = random.nextBoolean() ? 1 : -1;
-        this.dy = random.nextBoolean() ? 1 : -1;
+        //si es true entonces que solo avance en x
+        if(random.nextBoolean()){
+            this.dx = random.nextBoolean() ? 1 : -1;
+            this.dy=0;
+        }
+        else{
+            this.dy = random.nextBoolean() ? 1 : -1;
+            this.dx=0;
+        }
         thread = new Thread(this);
     }
 
@@ -28,7 +35,7 @@ public class People implements Runnable, ThreadedAgent {
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.BLUE);
+        g.setColor(Color.ORANGE);
         g.fillOval(x - radius, y - radius, radius * 2, radius * 2);
     }
 
