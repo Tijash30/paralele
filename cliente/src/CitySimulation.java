@@ -62,7 +62,7 @@ public class CitySimulation extends JPanel {
 
     public void addPerson() {
         People person = new People(random.nextInt((width/100)-1) * 100 + 105,
-                                    random.nextInt((height/100)-1) * 100 + 105);
+                                    random.nextInt((height/100)-1) * 100 + 105, taxis);
         people.add(person);
         new Thread(person).start();
     }
@@ -85,7 +85,8 @@ public class CitySimulation extends JPanel {
             taxi.draw(g);
         }
         for (People person : people) {
-            person.draw(g);
+            if(!person.isOnRide)
+                person.draw(g);
         }
         for (Intersection intersection : intersections) {
             intersection.draw(g);

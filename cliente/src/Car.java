@@ -4,7 +4,7 @@ import java.util.Random;
 public class Car implements Runnable, ThreadedAgent {
     private int x, y;
     private final int width = 20, height = 10;
-    private int moveType;
+    public int moveType;
     private int dx, dy;
     private int id=-1;
     private boolean running = true, fs=true;

@@ -1,15 +1,23 @@
 import java.awt.*;
 import java.util.Random;
+import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class People implements Runnable, ThreadedAgent {
     private int x, y;
     private final int radius = 5;
-    private int dx, dy;
+    public int dx, dy;
     private int id;
     private boolean running = true;
     private Thread thread;
+    private ArrayList<Taxi> taxis;
+    private boolean allowMovement= true;
+    public boolean isOnRide=false;
 
-    public People(int x, int y) {
+    private final Lock lock = new ReentrantLock();
+
+    public People(int x, int y, ArrayList<Taxi> taxis) {
         this.x = x;
         this.y = y;
         Random random = new Random();
@@ -23,15 +31,33 @@ public class People implements Runnable, ThreadedAgent {
             this.dx=0;
         }
         thread = new Thread(this);
+        this.taxis= taxis;
     }
 
     public void move(int width, int height) {
-        x += dx;
-        y += dy;
+        if(allowMovement){
+            x += dx;
+            y += dy;
 
-        // Bounce off boundaries
-        if (x < 50 || x > width - 50) dx *= -1;
-        if (y < 50 || y > height - 50) dy *= -1;
+            // Bounce off boundaries
+            if (x < 50 || x > width - 50) dx *= -1;
+            if (y < 50 || y > height - 50) dy *= -1;
+        }
+
+        if(!taxis.isEmpty()){
+            for(Taxi taxi : taxis){
+                if((this.x<taxi.getX()+50&&this.x>taxi.getX()-50) && (this.y<taxi.getY()+50&&this.y>taxi.getY()-50)){
+                    if((this.x<taxi.getX()+21&&this.x>taxi.getX()-21) && (this.y<taxi.getY()+21&&this.y>taxi.getY()-21)){
+                        isOnRide= true;
+                        lock.lock();
+                        taxi.getPassa(this);
+                        break;
+                    }
+                    allowMovement=false;
+                }else
+                    allowMovement=true;
+            }
+        }
     }
 
     public void draw(Graphics g) {
@@ -56,6 +82,14 @@ public class People implements Runnable, ThreadedAgent {
         }
     }
 
+    private boolean allowedMovement(){
+        String respuestaServidor = MessageSender.sendMessage(4,id,x+dx,y+dy,2);
+        if(respuestaServidor.equals("Ok")){
+            return true;
+        }
+        return false;
+    }
+
     public void setId(){
         /*
         if(id==-1){
@@ -64,6 +98,18 @@ public class People implements Runnable, ThreadedAgent {
                 id=Integer.parseInt(respuestaServidor.substring(3));
             }
         }*/
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public Lock getLock() {
+        return lock;
     }
 
     public void stop() {
