@@ -40,8 +40,16 @@ public class People implements Runnable, ThreadedAgent {
             y += dy;
 
             // Bounce off boundaries
-            if (x < 50 || x > width - 50) dx *= -1;
-            if (y < 50 || y > height - 50) dy *= -1;
+            if(x<=0)
+                dx=1;
+            if(x>=width+55)
+                dx=-1;
+            if(y<=0)
+                dy=1;
+            if(y>=height+55)
+                dy=-1;
+            //if (x <=0 || x >=width+50 ) dx *= -1;
+            //if (y <=0 || y >=height+50) dy *= -1;
         }
 
         if(!taxis.isEmpty()){

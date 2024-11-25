@@ -62,7 +62,8 @@ public class CitySimulation extends JPanel {
 
     public void addPerson() {
         People person = new People(random.nextInt((width/100)-1) * 100 + 105,
-                                    random.nextInt((height/100)-1) * 100 + 105, taxis);
+                                    random.nextInt((height/100)-1) * 100 + 105, 
+                                    taxis);
         people.add(person);
         new Thread(person).start();
     }

@@ -68,6 +68,9 @@ class TrafficManager implements Runnable {
                     break;   // Added break to prevent fall-through to the next case
 
                 case 4:
+                    //checks for red and green lights 
+
+                break;
                 case 5:
                     // Check for collision and update car
                     if (positionManager.isCollisionFree(id, x, y, dir)) {
@@ -75,7 +78,7 @@ class TrafficManager implements Runnable {
                     } else {
                         ans = false;  // Set answer to false if no collision
                     }
-                    break;   // Added break to prevent fall-through to the next case
+                    break;  
 
                 case 6:
                     //System.out.println("Deletion petition");

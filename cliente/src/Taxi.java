@@ -24,10 +24,10 @@ public class Taxi extends Car {
             elapsedTime = System.currentTimeMillis() - startTime;
         }
         Lock lock = person.getLock();
-        if((this.getX()>100 && this.getX()<700) && (this.getY()>100 && this.getY()<500)){
+        //if((this.getX()>100 && this.getX()<700) && (this.getY()>100 && this.getY()<500)){
             if (lock.tryLock()) {
                 try {
-                    System.out.println("bajó del taxi sin problema");
+                    System.out.println("bajó del taxi sin problema en       x: "+this.getX()+" y: "+this.getY());
                 } finally {
                     lock.unlock(); 
                     person.isOnRide=false;
@@ -61,7 +61,7 @@ public class Taxi extends Car {
                     
                 }
             }
-        }
+        //}
     }
 
 
