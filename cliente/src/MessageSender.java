@@ -15,28 +15,31 @@ public class MessageSender {
     6.- Remove Car
      */
 
-    public static String sendMessage(int type, int id, int x, int y, int mov){
-
+    public static String sendMessage(int type, int id, int x, int y, int mov) {
         // Create the message to send
-        String message = type + " " + id + " " + x + " " + y + " " + mov+" ";
-        try (Socket socket = new Socket("localhost", 1234)) {
-            // Send message to server
-            PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-            output.println(message);  // Sends the message
+        String message = type + " " + id + " " + x + " " + y + " " + mov + " ";
+        int basePort = 1234;
+        int maxRetries = 5;
 
+        for (int i = 0; i < maxRetries; i++) {
+            int port = basePort + i;
+            try (Socket socket = new Socket("localhost", port)) {
+                // Send message to server
+                PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
+                output.println(message);  // Sends the message
 
-            // Read the server's response
-            BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String respuestaServidor = input.readLine();
-            input.close();
-            output.close();
-            return respuestaServidor;
-
-        } catch (IOException e) {
-            System.err.println("Error occurred while sending message: " + e.getMessage());
-            e.printStackTrace();  // Optionally print stack trace for debugging
+                // Read the server's response
+                BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                String respuestaServidor = input.readLine();
+                input.close();
+                output.close();
+                return respuestaServidor;
+            } catch (IOException e) {
+                System.err.println("Port " + port + " is unavailable. Trying the next port...");
+            }
         }
 
+        System.err.println("Failed to connect to any of the ports after " + maxRetries + " attempts.");
         return "";
     }
 

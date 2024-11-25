@@ -25,6 +25,7 @@ public class Car implements Runnable, ThreadedAgent {
             this.x-=20;
         }
         setId();
+        this.thread= new Thread();
     }
 
     public void move() {
