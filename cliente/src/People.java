@@ -54,26 +54,34 @@ public class People implements Runnable, ThreadedAgent {
 
         if(!taxis.isEmpty()){
             for(Taxi taxi : taxis){
+                //si el taxi ya tiene un pasagero 
                 if(!taxi.hasPassa){
+                    //si el taxi está cerca
                     if((this.x<taxi.getX()+50&&this.x>taxi.getX()-50) && (this.y<taxi.getY()+50&&this.y>taxi.getY()-50)){
+                        //si el taxi está muy cerca
                         if((this.x<taxi.getX()+21&&this.x>taxi.getX()-21) && (this.y<taxi.getY()+21&&this.y>taxi.getY()-21)){
                             taxi.fs= false;
+                            int deltaX = (taxi.getX() - this.x) / 7;
+                            int deltaY = (taxi.getY() - this.y) / 7;
                             for(int k=0; k<7; k++){
-                                if(taxi.moveType==0)
+                                /*if(taxi.moveType==0)
                                     y-=2;
                                 else if(taxi.moveType==2)
                                     y+=2;
                                 else if(taxi.moveType==1)
                                     x-=2;
                                 else if(taxi.moveType==3)
-                                    x+=2;
+                                    x+=2;*/
+                                x += deltaX;
+                                y += deltaY;
                                 try {
-                                    Thread.sleep(100); // Slower than cars/taxis
+                                    Thread.sleep(100); 
                                 } catch (InterruptedException e) {
                                     Thread.currentThread().interrupt();
                                 }
                             }
                             lock.lock();
+                            thread= Thread.currentThread();
                             isOnRide= true;
                             taxi.fs= true;
                             taxi.getPassa(this);

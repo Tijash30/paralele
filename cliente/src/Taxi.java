@@ -18,6 +18,8 @@ public class Taxi extends Car {
 
     public void getPassa(People person){
 
+        this.hasPassa=true;
+
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
 
@@ -25,7 +27,6 @@ public class Taxi extends Car {
             elapsedTime = System.currentTimeMillis() - startTime;
         }
         Lock lock = person.getLock();
-        this.hasPassa=true;
         if (lock.tryLock()) {
             try {
                 System.out.println("bajó del taxi sin problema en       x: "+this.getX()+" y: "+this.getY());
@@ -55,7 +56,7 @@ public class Taxi extends Car {
                     person.setY(this.getY());
                 }
                 try {
-                    person.getThread().sleep(1000);
+                    person.getThread().sleep(1500);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
