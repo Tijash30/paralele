@@ -7,7 +7,8 @@ public class Car implements Runnable, ThreadedAgent {
     public int moveType;
     private int dx, dy;
     private int id=-1;
-    private boolean running = true, fs=true;
+    private boolean running = true;
+    public boolean fs=true;
     private Thread thread;
     private static Random random;
 

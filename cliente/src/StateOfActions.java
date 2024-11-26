@@ -46,7 +46,7 @@ public class StateOfActions extends JFrame {
         JTable table = tabTables.get(tabTitle);
         int contStates[]={0,0,0,0,0,0,0};
         String difStatesCars[]={"Creando", "Esperando", "Esperando", "Esperando", "Esperando", "Manejando", "Se fue"};
-        String difStatesPeople[]={"Creando", "Esperando", "Esperando", "Esperando", "Esperando", "Manejando", "Se fue"};
+        String difStatesPeople[]={"Creando", "Esperando para Bajar", "Esperando", "Esperando", "Esperando", "Caminando", "Se fue"};
 
         if (table != null) {
             // Create a DefaultTableModel with column headers

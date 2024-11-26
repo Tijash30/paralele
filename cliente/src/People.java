@@ -42,11 +42,11 @@ public class People implements Runnable, ThreadedAgent {
             // Bounce off boundaries
             if(x<=0)
                 dx=1;
-            if(x>=width+55)
+            else if(x>=width+55)
                 dx=-1;
-            if(y<=0)
+            else if(y<=0)
                 dy=1;
-            if(y>=height+55)
+            else if(y>=height+55)
                 dy=-1;
             //if (x <=0 || x >=width+50 ) dx *= -1;
             //if (y <=0 || y >=height+50) dy *= -1;
@@ -54,16 +54,35 @@ public class People implements Runnable, ThreadedAgent {
 
         if(!taxis.isEmpty()){
             for(Taxi taxi : taxis){
-                if((this.x<taxi.getX()+50&&this.x>taxi.getX()-50) && (this.y<taxi.getY()+50&&this.y>taxi.getY()-50)){
-                    if((this.x<taxi.getX()+21&&this.x>taxi.getX()-21) && (this.y<taxi.getY()+21&&this.y>taxi.getY()-21)){
-                        isOnRide= true;
-                        lock.lock();
-                        taxi.getPassa(this);
-                        break;
-                    }
-                    allowMovement=false;
-                }else
-                    allowMovement=true;
+                if(!taxi.hasPassa){
+                    if((this.x<taxi.getX()+50&&this.x>taxi.getX()-50) && (this.y<taxi.getY()+50&&this.y>taxi.getY()-50)){
+                        if((this.x<taxi.getX()+21&&this.x>taxi.getX()-21) && (this.y<taxi.getY()+21&&this.y>taxi.getY()-21)){
+                            taxi.fs= false;
+                            for(int k=0; k<7; k++){
+                                if(taxi.moveType==0)
+                                    y-=2;
+                                else if(taxi.moveType==2)
+                                    y+=2;
+                                else if(taxi.moveType==1)
+                                    x-=2;
+                                else if(taxi.moveType==3)
+                                    x+=2;
+                                try {
+                                    Thread.sleep(100); // Slower than cars/taxis
+                                } catch (InterruptedException e) {
+                                    Thread.currentThread().interrupt();
+                                }
+                            }
+                            lock.lock();
+                            isOnRide= true;
+                            taxi.fs= true;
+                            taxi.getPassa(this);
+                            break;
+                        }
+                        allowMovement=false;
+                    }else
+                        allowMovement=true;
+                }
             }
         }
     }
@@ -80,6 +99,7 @@ public class People implements Runnable, ThreadedAgent {
 
     @Override
     public void run() {
+        thread= Thread.currentThread();
         while (running) {
             move(800, 600);
             try {
