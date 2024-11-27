@@ -119,7 +119,7 @@ public class CitySimulation extends JPanel {
         return cars;
     }
 
-    public static void main(String[] args) {
+    public void maino() {
         JFrame frame = new JFrame("City Simulation with Controls");
         CitySimulation city = new CitySimulation();
         ThreadStateWindow threadStateWindow = new ThreadStateWindow();
