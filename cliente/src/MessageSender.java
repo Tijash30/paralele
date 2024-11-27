@@ -20,7 +20,6 @@ public class MessageSender {
         String message = type + " " + id + " " + x + " " + y + " " + mov + " ";
         int basePort = 1234;
         int maxRetries = 5;
-
         for (int i = 0; i < maxRetries; i++) {
             int port = basePort + i;
             try (Socket socket = new Socket("localhost", port)) {

@@ -8,6 +8,7 @@ public class People implements Runnable, ThreadedAgent {
     private int x, y;
     private final int radius = 5;
     public int dx, dy;
+    private int previousTaxi;
     private int id;
     private boolean running = true;
     private Thread thread;
@@ -32,6 +33,8 @@ public class People implements Runnable, ThreadedAgent {
         }
         thread = new Thread(this);
         this.taxis= taxis;
+        this.previousTaxi =-1;
+        this.id=-1;
     }
 
     public void move(int width, int height) {
@@ -50,28 +53,22 @@ public class People implements Runnable, ThreadedAgent {
                 dy=-1;
             //if (x <=0 || x >=width+50 ) dx *= -1;
             //if (y <=0 || y >=height+50) dy *= -1;
+            updateMovement();
         }
 
         if(!taxis.isEmpty()){
             for(Taxi taxi : taxis){
                 //si el taxi ya tiene un pasagero 
-                if(!taxi.hasPassa){
+                if(!taxi.isLoaded()&&taxi.getId()!=this.previousTaxi){
                     //si el taxi está cerca
                     if((this.x<taxi.getX()+50&&this.x>taxi.getX()-50) && (this.y<taxi.getY()+50&&this.y>taxi.getY()-50)){
                         //si el taxi está muy cerca
                         if((this.x<taxi.getX()+21&&this.x>taxi.getX()-21) && (this.y<taxi.getY()+21&&this.y>taxi.getY()-21)){
-                            taxi.fs= false;
+                            taxi.setPassager(this);
+                            taxi.loading= true;
                             int deltaX = (taxi.getX() - this.x) / 7;
                             int deltaY = (taxi.getY() - this.y) / 7;
                             for(int k=0; k<7; k++){
-                                /*if(taxi.moveType==0)
-                                    y-=2;
-                                else if(taxi.moveType==2)
-                                    y+=2;
-                                else if(taxi.moveType==1)
-                                    x-=2;
-                                else if(taxi.moveType==3)
-                                    x+=2;*/
                                 x += deltaX;
                                 y += deltaY;
                                 try {
@@ -80,11 +77,9 @@ public class People implements Runnable, ThreadedAgent {
                                     Thread.currentThread().interrupt();
                                 }
                             }
-                            lock.lock();
-                            thread= Thread.currentThread();
                             isOnRide= true;
-                            taxi.fs= true;
-                            taxi.getPassa(this);
+                            taxi.loading= false;
+                            previousTaxi = taxi.getId();
                             break;
                         }
                         allowMovement=false;
@@ -108,32 +103,35 @@ public class People implements Runnable, ThreadedAgent {
     @Override
     public void run() {
         thread= Thread.currentThread();
+        if(id==-1)
+            setId();
         while (running) {
-            move(800, 600);
+            if(!isOnRide)
+                move(800, 600);
             try {
                 Thread.sleep(100); // Slower than cars/taxis
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
+        MessageSender.sendMessage(9,id,x,y,2);
     }
 
-    private boolean allowedMovement(){
-        String respuestaServidor = MessageSender.sendMessage(4,id,x+dx,y+dy,2);
+    private void updateMovement(){
+        String respuestaServidor = MessageSender.sendMessage(8,id,x,y,2);
         if(respuestaServidor.equals("Ok")){
-            return true;
+            return;
         }
-        return false;
+
     }
 
     public void setId(){
-        /*
         if(id==-1){
-            String respuestaServidor="Ok 1";
+            String respuestaServidor=MessageSender.sendMessage(7,id,x,y,0);
             if(respuestaServidor.contains("Ok")){
                 id=Integer.parseInt(respuestaServidor.substring(3));
             }
-        }*/
+        }
     }
 
     public void setX(int x) {
@@ -144,12 +142,15 @@ public class People implements Runnable, ThreadedAgent {
         this.y = y;
     }
 
-    public Lock getLock() {
-        return lock;
-    }
-
     public void stop() {
         running = false;
     }
 
+    public boolean isRunning() {
+        return running;
+    }
+
+    public boolean isAllowMovement() {
+        return allowMovement;
+    }
 }

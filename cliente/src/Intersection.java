@@ -8,11 +8,12 @@ public class Intersection implements Runnable, ThreadedAgent {
     private final TrafficLight[] lights = new TrafficLight[4]; // Four traffic lights (one per direction)
     private final AtomicBoolean running = new AtomicBoolean(true); // To stop the thread gracefully
     private Thread thread;
+    public static long timeLenght=3000L;
 
     public Intersection(int x, int y) {
         this.x = x;
         this.y = y;
-
+        timeLenght=750L;
         // Initialize the traffic lights for each direction
         lights[0] = new TrafficLight(x - CityMap.streetWidth/2, y - CityMap.streetWidth/2,true); // Top
         lights[1] = new TrafficLight(x - 5 + CityMap.streetWidth/2, y - CityMap.streetWidth/2,false); // Right
@@ -54,19 +55,22 @@ public class Intersection implements Runnable, ThreadedAgent {
         activeLight = 0;
         while (running.get()) {
             // Cycle to the next light
-            activeLight = (activeLight + 1) % 8;
+            activeLight = (activeLight + 1) % 2;
             MessageSender.sendMessage(3,id,x,y,activeLight);
+            //System.out.println("Updated light");
             // Activate one light at a time
             for (int i = 0; i < lights.length; i++) {
-                lights[i].setGreen(i%2 == (activeLight/4)%2);
+                lights[i].setGreen(i%2 == activeLight%2);
             }
             // Simulate traffic light delay
             try {
-                Thread.sleep(750); // 3 seconds per light
+                Thread.sleep(timeLenght); // 3 seconds per light
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
             }
         }
     }
+
+
 }

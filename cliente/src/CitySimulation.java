@@ -12,6 +12,7 @@ public class CitySimulation extends JPanel {
     private final static int width = 860;
     private final static int height = 660;
     public static Random random;
+    public int update;
 
     public CitySimulation() {
         random = new Random();
@@ -19,6 +20,7 @@ public class CitySimulation extends JPanel {
         setPreferredSize(new Dimension(width, height));
         // Initialize intersections
         initializeIntersections();
+        update=0;
     }
 
     private void initializeIntersections() {
@@ -94,6 +96,13 @@ public class CitySimulation extends JPanel {
         }
     }
 
+    private void repainted(){
+        update=(update+1)%30;
+    }
+    public void updateTimers(long newTime){
+            Intersection.timeLenght=newTime;
+    }
+
     public ArrayList<Intersection> getIntersections() {
         return intersections;
     }
@@ -124,7 +133,7 @@ public class CitySimulation extends JPanel {
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 
         // Control Panel
-        JPanel controlPanel = new JPanel(new GridLayout(3, 1, 10, 10));
+        JPanel controlPanel = new JPanel(new GridLayout(4, 1, 10, 10));
 
         // Car Controls
         JPanel carPanel = new JPanel(new FlowLayout());
@@ -162,6 +171,30 @@ public class CitySimulation extends JPanel {
         peoplePanel.add(removePeopleButton);
         controlPanel.add(peoplePanel);
 
+        JPanel intersectionPanel = new JPanel(new FlowLayout());
+        JLabel intersectionLabel = new JLabel("Intersection:");
+        JButton intersectionButton = new JButton("Modify Time");
+        JTextField intersectionTextField = new JFormattedTextField("750");
+
+        // Set a larger preferred size for the text field
+        intersectionTextField.setPreferredSize(new Dimension(100, 30));
+
+        intersectionButton.addActionListener(e -> {
+            String aux = intersectionTextField.getText();
+            Long newTime=3000L;
+            try {
+                newTime = Long.parseLong(aux);
+            } catch (NumberFormatException ex) {
+                newTime = 3000L;
+            }
+            city.updateTimers(newTime);
+        });
+
+        intersectionPanel.add(intersectionLabel);
+        intersectionPanel.add(intersectionTextField);
+        intersectionPanel.add(intersectionButton);
+        controlPanel.add(intersectionPanel);
+
         tabbedPane.add("Controls", controlPanel);
 
         // Add City Simulation and Controls to Main Panel
@@ -174,26 +207,28 @@ public class CitySimulation extends JPanel {
         frame.add(mainPanel);
         frame.pack();
         frame.setVisible(true);
-
         // Repaint Continuously
         new Timer(16, e ->{
             city.repaint();
-            threadStateWindow.updateThreadStates(
-                    city.getCars(),
-                    city.getTaxis(),
-                    city.getPeople(),
-                    city.getIntersections()
-            );
-            statesofthreads.updateThreadStates(
-                    city.getCars(),
-                    city.getTaxis(),
-                    city.getPeople()
-            );
-            stateofactions.updateThreadStates(
-                    city.getCars(),
-                    city.getTaxis(),
-                    city.getPeople()
-            );
+            city.repainted();
+            if(city.update==0){
+                threadStateWindow.updateThreadStates(
+                        city.getCars(),
+                        city.getTaxis(),
+                        city.getPeople(),
+                        city.getIntersections()
+                );
+                statesofthreads.updateThreadStates(
+                        city.getCars(),
+                        city.getTaxis(),
+                        city.getPeople()
+                );
+                stateofactions.updateThreadStates(
+                        city.getCars(),
+                        city.getTaxis(),
+                        city.getPeople()
+                );
+            }
         } ).start(); // ~60 FPS
     }
 }

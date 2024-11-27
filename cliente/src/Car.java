@@ -2,15 +2,16 @@ import java.awt.*;
 import java.util.Random;
 
 public class Car implements Runnable, ThreadedAgent {
-    private int x, y;
+    protected int x, y;
     private final int width = 20, height = 10;
     public int moveType;
-    private int dx, dy;
+    protected int dx, dy;
     private int id=-1;
-    private boolean running = true;
+    protected boolean running = true;
     public boolean fs=true;
     private Thread thread;
-    private static Random random;
+    protected static Random random;
+    protected boolean trafico;
 
     public Car(int x, int y) {
         this.x = x;
@@ -31,6 +32,7 @@ public class Car implements Runnable, ThreadedAgent {
 
     public void move() {
         if(allowedMovement()&&fs){
+            trafico = false;
             x += dx;
             y += dy;
             if((this.moveType==0||this.moveType==2)&&(this.x%100==65||this.x%100==85||this.x%100==66||this.x%100==86)){
@@ -59,6 +61,8 @@ public class Car implements Runnable, ThreadedAgent {
                 }
 
             }
+        }else{
+            trafico=true;
         }
         if(!running&&fs){
             String ans =MessageSender.sendMessage(6,id,x,y,moveType);
@@ -75,7 +79,7 @@ public class Car implements Runnable, ThreadedAgent {
         return false;
     }
 
-    private boolean allowedRotation(int nxtRotation){
+    protected boolean allowedRotation(int nxtRotation){
         String respuestaServidor = MessageSender.sendMessage(5,id,x,y,nxtRotation);
         if(respuestaServidor.equals("Ok")){
             return true;
@@ -83,7 +87,7 @@ public class Car implements Runnable, ThreadedAgent {
         return false;
     }
 
-    private void updateMove(){
+    protected void updateMove(){
         this.dx = moveType %2==0 ? 2 : 0;
         if(moveType /2 >0){
             this.dx *=-1;
@@ -169,6 +173,58 @@ public class Car implements Runnable, ThreadedAgent {
 
     public void setMoveType(int moveType) {
         this.moveType = moveType;
+    }
+
+    public int getDx() {
+        return dx;
+    }
+
+    public void setDx(int dx) {
+        this.dx = dx;
+    }
+
+    public int getDy() {
+        return dy;
+    }
+
+    public void setDy(int dy) {
+        this.dy = dy;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+
+    public boolean isFs() {
+        return fs;
+    }
+
+    public void setFs(boolean fs) {
+        this.fs = fs;
+    }
+
+    public void setThread(Thread thread) {
+        this.thread = thread;
+    }
+
+    public static Random getRandom() {
+        return random;
+    }
+
+    public static void setRandom(Random random) {
+        Car.random = random;
     }
 }
 
