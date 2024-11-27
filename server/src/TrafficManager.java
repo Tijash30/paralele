@@ -14,6 +14,9 @@ class TrafficManager implements Runnable {
     4.- Ask for movement
     5.- Ask for turn
     6.- Remove Car
+    7.- Register People
+    8.- Update People
+    9.- Remove People
      */
 
     public TrafficManager(Socket clientSocket) {
@@ -68,9 +71,18 @@ class TrafficManager implements Runnable {
                     break;   // Added break to prevent fall-through to the next case
 
                 case 4:
-                    //checks for red and green lights 
+                    // Check for collision and update car
+                    if(positionManager.isGreen(id, x, y, dir)){
 
-                break;
+                        if (positionManager.isCollisionFree(id, x, y, dir)) {
+                            positionManager.updateCar(id, x, y, dir);
+                        } else {
+                            ans = false;  // Set answer to false if no collision
+                        }
+                    } else{
+                        ans = false;
+                    }
+                    break;
                 case 5:
                     // Check for collision and update car
                     if (positionManager.isCollisionFree(id, x, y, dir)) {
@@ -78,11 +90,34 @@ class TrafficManager implements Runnable {
                     } else {
                         ans = false;  // Set answer to false if no collision
                     }
-                    break;  
+
+                    break;
 
                 case 6:
                     //System.out.println("Deletion petition");
                     positionManager.deleteCar(id);
+                    break;
+
+                case 7:
+                    //System.out.println("Deletion petition");
+                    while (id==-1){
+                        id = positionManager.registerPerson(x,y);
+                        try {
+                            Thread.sleep(40);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    break;
+
+                case 8:
+                    //System.out.println("Deletion petition");
+                    positionManager.updatePeople(id,x,y);
+                    break;
+
+                case 9:
+                    //System.out.println("Deletion petition");
+                    positionManager.deletePeople(id);
                     break;
             }
 
@@ -92,7 +127,7 @@ class TrafficManager implements Runnable {
             if (ans) {
                 // Send 'Ok' message, include id if type is 0
                 String message="Ok";
-                if(type==0||type==1){
+                if(type==0||type==1||type==7){
                     message+=" "+id;
                 }
                 output.println(message);
